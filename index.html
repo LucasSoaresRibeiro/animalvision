@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Visão de um Cachorro</title>
+</head>
+<body>
+    <h1>Visão de um Cachorro</h1>
+    <video id="video" width="400" height="300" autoplay></video>
+    <canvas id="canvas" width="400" height="300"></canvas>
+    
+    <script>
+        // Obter acesso à câmera do dispositivo
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                var video = document.getElementById('video');
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function(error) {
+                console.log('Ocorreu um erro ao acessar a câmera: ' + error);
+            });
+
+        // Capturar quadros do vídeo e desenhar no canvas
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var video = document.getElementById('video');
+
+        function drawFrame() {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            applyDogVisionFilter();
+            requestAnimationFrame(drawFrame);
+        }
+
+        // Aplicar filtro de visão de cachorro aos quadros
+        function applyDogVisionFilter() {
+            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var data = imageData.data;
+
+            for (var i = 0; i < data.length; i += 4) {
+                var red = data[i];
+                var green = data[i + 1];
+                var blue = data[i + 2];
+
+                // Simular a visão de um cachorro (filtro de cores)
+                var gray = 0.299 * red + 0.587 * green + 0.114 * blue; // Converter para escala de cinza
+                data[i] = gray; // Canal vermelho
+                data[i + 1] = gray; // Canal verde
+                data[i + 2] = gray; // Canal azul
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Iniciar a captura dos quadros do vídeo
+        video.addEventListener('play', function() {
+            requestAnimationFrame(drawFrame);
+        });
+    </script>
+</body>
+</html>
