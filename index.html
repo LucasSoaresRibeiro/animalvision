@@ -5,25 +5,31 @@
     <title>Visão Animal</title>
 </head>
 <body>
-    <h1>Visão Animal</h1>
-        <!--
-            <button onclick="startCamera()">
-                <span style="font-size: 50px;" >
-                    Iniciar Câmera
+    <span style="font-size: 60px; text-align: center;" >
+        <h1>Visão Animal</h1>
+        <p>Clique nos botões abaixo</p>
+    </span>
+    <div style="text-align: center;">
+            <!--
+                <button onclick="startCamera()">
+                    <span style="font-size: 50px;" >
+                        Iniciar Câmera
+                    </span>
+                </button>
+            -->
+            <button onclick="applyDogVision()">
+                <span style="font-size: 120px;" >
+                    🐶 Cachorro 
                 </span>
             </button>
-        -->
-        <button onclick="applyDogVision()">
-            <span style="font-size: 150px;" >
-                Visão de Cachorro 🐶
-            </span>
-        </button>
-        <button onclick="applyFishVision()">
-            <span style="font-size: 150px;" >
-                Visão de Peixe 🐟
-            </span>
-        </button>
-    </span>
+            <br>
+            <br>
+            <button onclick="applyFishVision()">
+                <span style="font-size: 120px;" >
+                    🐟 Peixe
+                </span>
+            </button>
+    </div>
 
     <video id="video" width="400" height="300" style="display: none;"></video>
     <canvas id="canvas" width="800" height="600"></canvas>
