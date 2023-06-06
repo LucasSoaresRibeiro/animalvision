@@ -2,91 +2,37 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Visão Animal</title>
+    <title>Visão de um Cachorro</title>
 </head>
 <body>
-    <h1>Visão Animal</h1>
-    <button onclick="startCamera()">Iniciar Câmera</button>
-    <button onclick="applyDogVision()">Visão de Cachorro</button>
-    <button onclick="applyFishVision()">Visão de Peixe</button>
-    <video id="video" width="400" height="300" style="display: none;"></video>
-    <canvas id="canvas" width="400" height="300"></canvas>
+    <h1>Visão de um Cachorro</h1>
+    <video id="video" width="400" height="300" autoplay></video>
     
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <script>
         // Variáveis globais
-        var videoStream;
         var videoElement = document.getElementById('video');
-        var canvasElement = document.getElementById('canvas');
-        var canvasContext = canvasElement.getContext('2d');
-        var currentFilter = null;
 
-        // Iniciar a câmera do dispositivo móvel
-        function startCamera() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        videoStream = stream;
-                        videoElement.srcObject = stream;
-                        videoElement.play();
-                        startDrawing();
-                    })
-                    .catch(function(error) {
-                        console.log('Ocorreu um erro ao acessar a câmera: ' + error);
-                    });
-            }
-        }
-
-        // Capturar quadros do vídeo e desenhar no canvas
-        function startDrawing() {
-            requestAnimationFrame(drawFrame);
-        }
-
-        function drawFrame() {
-            canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-            applyCurrentFilter();
-            requestAnimationFrame(drawFrame);
-        }
-
-        // Aplicar filtro de visão de cachorro aos quadros
-        function applyDogVision() {
-            currentFilter = 'dog';
-        }
-
-        // Aplicar filtro de visão de peixe aos quadros
-        function applyFishVision() {
-            currentFilter = 'fish';
-        }
-
-        // Aplicar filtro atual aos quadros
-        function applyCurrentFilter() {
-            var imageData = canvasContext.getImageData(0, 0, canvasElement.width, canvasElement.height);
-            var data = imageData.data;
-
-            for (var i = 0; i < data.length; i += 4) {
-                var red = data[i];
-                var green = data[i + 1];
-                var blue = data[i + 2];
-
-                // Aplicar filtro de visão de cachorro
-                if (currentFilter === 'dog') {
-                    var gray = 0.299 * red + 0.587 * green + 0.114 * blue;
-                    data[i] = gray;
-                    data[i + 1] = gray;
-                    data[i + 2] = gray;
+        // Verificar se o navegador suporta a API WebRTC
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Configurar as restrições de vídeo para a câmera
+            var constraints = {
+                video: {
+                    facingMode: 'environment' // Use a câmera traseira (se disponível)
                 }
+            };
 
-                // Aplicar filtro de visão de peixe
-                if (currentFilter === 'fish') {
-                    var redFish = red;
-                    var greenFish = blue;
-                    var blueFish = green;
-                    data[i] = redFish;
-                    data[i + 1] = greenFish;
-                    data[i + 2] = blueFish;
-                }
-            }
-
-            canvasContext.putImageData(imageData, 0, 0);
+            // Solicitar acesso à câmera
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+                })
+                .catch(function(error) {
+                    console.log('Ocorreu um erro ao acessar a câmera: ' + error);
+                });
+        } else {
+            console.log('Seu navegador não suporta a API WebRTC.');
         }
     </script>
 </body>
