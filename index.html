@@ -6,35 +6,47 @@
 </head>
 <body>
     <h1>Visão de um Cachorro</h1>
-    <video id="video" width="400" height="300" autoplay></video>
+    <button onclick="startCamera()">Iniciar Câmera</button>
+    <video id="video" width="400" height="300" style="display: none;"></video>
     <canvas id="canvas" width="400" height="300"></canvas>
     
     <script>
-        // Obter acesso à câmera do dispositivo
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-                var video = document.getElementById('video');
-                video.srcObject = stream;
-                video.play();
-            })
-            .catch(function(error) {
-                alert('Ocorreu um erro ao acessar a câmera: ' + error);
-            });
+        // Variáveis globais
+        var videoStream;
+        var videoElement = document.getElementById('video');
+        var canvasElement = document.getElementById('canvas');
+        var canvasContext = canvasElement.getContext('2d');
+
+        // Iniciar a câmera do dispositivo móvel
+        function startCamera() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        videoStream = stream;
+                        videoElement.srcObject = stream;
+                        videoElement.play();
+                        startDrawing();
+                    })
+                    .catch(function(error) {
+                        console.log('Ocorreu um erro ao acessar a câmera: ' + error);
+                    });
+            }
+        }
 
         // Capturar quadros do vídeo e desenhar no canvas
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        var video = document.getElementById('video');
+        function startDrawing() {
+            requestAnimationFrame(drawFrame);
+        }
 
         function drawFrame() {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
             applyDogVisionFilter();
             requestAnimationFrame(drawFrame);
         }
 
         // Aplicar filtro de visão de cachorro aos quadros
         function applyDogVisionFilter() {
-            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var imageData = canvasContext.getImageData(0, 0, canvasElement.width, canvasElement.height);
             var data = imageData.data;
 
             for (var i = 0; i < data.length; i += 4) {
@@ -49,13 +61,8 @@
                 data[i + 2] = gray; // Canal azul
             }
 
-            ctx.putImageData(imageData, 0, 0);
+            canvasContext.putImageData(imageData, 0, 0);
         }
-
-        // Iniciar a captura dos quadros do vídeo
-        video.addEventListener('play', function() {
-            requestAnimationFrame(drawFrame);
-        });
     </script>
 </body>
 </html>
